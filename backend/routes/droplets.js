@@ -67,7 +67,7 @@ router.get('/live-costs', authMiddleware, async (req, res) => {
         `https://api.digitalocean.com/v2/droplets?page=${page}&per_page=200`,
         {
           headers: {
-            'Authorization': `Bearer ${req.session.doAccessToken}`,
+            'Authorization': `Bearer ${req.doAccessToken}`,
             'Content-Type': 'application/json'
           }
         }
@@ -164,6 +164,72 @@ router.get('/live-costs', authMiddleware, async (req, res) => {
     
     res.status(500).json({
       message: 'Error fetching droplet data',
+      error: error.message
+    });
+  }
+});
+
+// Get droplet names by IDs
+router.post('/names', authMiddleware, async (req, res) => {
+  try {
+    const { dropletIds } = req.body;
+    
+    if (!dropletIds || !Array.isArray(dropletIds)) {
+      return res.status(400).json({
+        message: 'dropletIds array is required'
+      });
+    }
+
+    if (dropletIds.length === 0) {
+      return res.json({});
+    }
+
+    // Limit to prevent abuse
+    if (dropletIds.length > 100) {
+      return res.status(400).json({
+        message: 'Maximum 100 droplet IDs allowed per request'
+      });
+    }
+
+    const dropletNames = {};
+    
+    // Fetch droplets in batches to avoid URL length limits
+    const batchSize = 20;
+    for (let i = 0; i < dropletIds.length; i += batchSize) {
+      const batch = dropletIds.slice(i, i + batchSize);
+      const idsParam = batch.join(',');
+      
+      const response = await axios.get(
+        `https://api.digitalocean.com/v2/droplets?ids=${idsParam}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${req.doAccessToken}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      if (response.data.droplets) {
+        response.data.droplets.forEach(droplet => {
+          dropletNames[droplet.id.toString()] = droplet.name;
+        });
+      }
+    }
+    
+    res.json(dropletNames);
+    
+  } catch (error) {
+    console.error('Error fetching droplet names:', error);
+    
+    if (error.response) {
+      return res.status(error.response.status).json({
+        message: 'Error fetching droplet names from DigitalOcean API',
+        error: error.response.data
+      });
+    }
+    
+    res.status(500).json({
+      message: 'Error fetching droplet names',
       error: error.message
     });
   }

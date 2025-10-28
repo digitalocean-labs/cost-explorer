@@ -8,7 +8,7 @@ router.get('/billing-periods', authMiddleware, async (req, res) => {
   try {
     const response = await axios.get('https://api.digitalocean.com/v2/customers/my/invoices', {
       headers: {
-        'Authorization': `Bearer ${req.session.doAccessToken}`,
+        'Authorization': `Bearer ${req.doAccessToken}`,
         'Content-Type': 'application/json'
       }
     });
@@ -67,7 +67,7 @@ router.get('/invoice/:invoiceId', authMiddleware, async (req, res) => {
       
       const invoicesResponse = await axios.get('https://api.digitalocean.com/v2/customers/my/invoices', {
         headers: {
-          'Authorization': `Bearer ${req.session.doAccessToken}`,
+          'Authorization': `Bearer ${req.doAccessToken}`,
           'Content-Type': 'application/json'
         }
       });
@@ -100,7 +100,7 @@ router.get('/invoice/:invoiceId', authMiddleware, async (req, res) => {
     console.log(`Fetching CSV for invoice UUID: ${invoiceUuid}`);
     const response = await axios.get(`https://api.digitalocean.com/v2/customers/my/invoices/${invoiceUuid}/csv`, {
       headers: {
-        'Authorization': `Bearer ${req.session.doAccessToken}`,
+        'Authorization': `Bearer ${req.doAccessToken}`,
         'Content-Type': 'application/json'
       },
       responseType: 'text'
