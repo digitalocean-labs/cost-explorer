@@ -35,5 +35,10 @@ export const dropletService = {
   getLiveCosts: async () => {
     const response = await apiClient.get('/droplets/live-costs');
     return response.data;
+  },
+  
+  getDropletNames: async (dropletIds) => {
+    const response = await apiClient.post('/droplets/names', { dropletIds });
+    return response.data;
   }
 };
