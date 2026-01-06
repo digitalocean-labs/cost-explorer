@@ -5,6 +5,7 @@ import Dashboard from './components/Dashboard';
 import Navigation from './components/Navigation';
 import PrivateRoute from './components/PrivateRoute';
 import LiveDropletDashboard from './components/LiveDropletDashboard';
+import BandwidthDashboard from './components/BandwidthDashboard';
 
 const App = () => {
   return (
@@ -29,6 +30,17 @@ const App = () => {
               <>
                 <Navigation />
                 <LiveDropletDashboard />
+              </>
+            </PrivateRoute>
+          } 
+        />
+        <Route 
+          path="/bandwidth" 
+          element={
+            <PrivateRoute>
+              <>
+                <Navigation />
+                <BandwidthDashboard />
               </>
             </PrivateRoute>
           } 

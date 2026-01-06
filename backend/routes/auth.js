@@ -4,6 +4,7 @@ const router = express.Router();
 const axios = require('axios');
 const querystring = require('querystring');
 const config = require('../config/config');
+const { encrypt } = require('../utils/encryption');
 
 // Initiate OAuth flow
 router.get('/login', (req, res) => {
@@ -41,9 +42,11 @@ router.get('/callback', async (req, res) => {
       }
     );
     
-    // Store token in session
-    req.session.doAccessToken = tokenResponse.data.access_token;
-    req.session.doRefreshToken = tokenResponse.data.refresh_token;
+    // Store encrypted tokens in session
+    req.session.doAccessToken = encrypt(tokenResponse.data.access_token, config.encryptionKey);
+    if (tokenResponse.data.refresh_token) {
+      req.session.doRefreshToken = encrypt(tokenResponse.data.refresh_token, config.encryptionKey);
+    }
     
     // Redirect to frontend dashboard
     res.redirect(`${config.frontendUrl}/dashboard`);

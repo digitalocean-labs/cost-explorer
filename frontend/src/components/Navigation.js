@@ -46,6 +46,16 @@ const Navigation = () => {
               >
                 Droplet Costs
               </Link>
+              <Link
+                to="/bandwidth"
+                className={`px-3 py-2 rounded-md text-sm font-medium ${
+                  location.pathname === '/bandwidth' 
+                    ? 'bg-[#0069d9] text-white' 
+                    : 'text-white hover:bg-[#0069d9]'
+                }`}
+              >
+                Bandwidth Breakdown
+              </Link>
             </div>
           </div>
           
